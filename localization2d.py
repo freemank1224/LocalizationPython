@@ -50,11 +50,20 @@ def localize(colors,measurements,motions,sensor_right,p_move):
     
     # >>> Insert your code here <<<
     
+    
     return p
 
 def show(p):
     rows = ['[' + ','.join(map(lambda x: '{0:.5f}'.format(x),r)) + ']' for r in p]
     print('[' + ',\n '.join(rows) + ']')
+    
+def sense(p, colors, measurements, sensor_wrong):
+    
+    return p
+    
+def move(p, motion, p_stay):
+    
+    return p
     
 #############################################################
 # For the following test case, your output should be 
