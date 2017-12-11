@@ -57,9 +57,20 @@ def show(p):
     rows = ['[' + ','.join(map(lambda x: '{0:.5f}'.format(x),r)) + ']' for r in p]
     print('[' + ',\n '.join(rows) + ']')
     
-def sense(p, colors, measurements, sensor_wrong):
-    
-    return p
+# Given initial p matrix, return the sense result for a SINGLE measurement!
+def sense(p, colors, measurement, sensor_right):
+    q = []
+    q_row = []
+    sensor_wrong = 1-sensor_right
+    for i in range(len(p)):
+        for j in range(len(p[i])):
+            right = (measurement == colors[i][j])
+            q_row.append(p[i][j] * (right*sensor_right + (1-right)*sensor_wrong))
+            #print(q_row)
+        q.append(q_row)
+        q_row = []
+        #print(i)
+    return q
     
 def move(p, motion, p_stay):
     
