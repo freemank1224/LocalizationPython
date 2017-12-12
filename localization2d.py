@@ -73,7 +73,7 @@ def sense(p, colors, measurement, sensor_right):
     return q
 
 # Given initial p matrix, return the move result for a SINGLE step!    
-def move(p, motion, p_stay):
+def move(p, motion, p_move):
     # Identify the direction: Horizontal
     #q = [[0 for row in range(len(p[0]))] for col in range(len(p))]
     q = []
@@ -87,9 +87,9 @@ def move(p, motion, p_stay):
         for i in range(len(p_trans)):
             q.append(p_trans[i][-motion[1]:] + p_trans[i][:-motion[1]])
         # When finish moving, transpose back to the original matrix p
-        p = [[row[i] for row in p_trans] for i in range(len(p_trans[0]))]
+        q = [[p_move*row[i] for row in p_trans] for i in range(len(p_trans[0]))]
         
-    return p
+    return q
     
 #############################################################
 # For the following test case, your output should be 
