@@ -49,8 +49,12 @@ def localize(colors,measurements,motions,sensor_right,p_move):
     p = [[pinit for row in range(len(colors[0]))] for col in range(len(colors))]
     
     # >>> Insert your code here <<<
+    for step, motion in enumerate(motions):
+        p = move(p, motions[step], p_move)
+        p = sense(p, colors, measurements[step], sensor_right)
+
     
-    
+#    p = sense(p, colors, measurements[step], sensor_right)
     return p
 
 def show(p):
@@ -62,32 +66,61 @@ def sense(p, colors, measurement, sensor_right):
     q = []
     q_row = []
     sensor_wrong = 1-sensor_right
+    sum_row = 0
+    sum_total = 0
     for i in range(len(p)):
         for j in range(len(p[i])):
             right = (measurement == colors[i][j])
             q_row.append(p[i][j] * (right*sensor_right + (1-right)*sensor_wrong))
+            sum_row = sum_row + q_row[j]
             #print(q_row)
         q.append(q_row)
+        sum_total = sum_total + sum_row
+        sum_row = 0
         q_row = []
-        #print(i)
+        print(sum_total)
+    # Normalization
+    for i in range(len(q)):
+        for j in range(len(q[0])):
+            q[i][j] /= sum_total
+    
     return q
 
-# Given initial p matrix, return the move result for a SINGLE step!    
+# Given initial p matrix, return the move result for a SINGLE step!   
+# All the probabilities in p matrix should add to ONE !
 def move(p, motion, p_move):
     # Identify the direction: Horizontal
     #q = [[0 for row in range(len(p[0]))] for col in range(len(p))]
-    q = []
+    q_move = []
+    q_move_back = []
+    q_stay = p
+    q = p
+    p_stay = 1-p_move
     if motion[0] == 0:
         #q_temp = []
         for i in range(len(p)):
-            q.append(p[i][-motion[1]:] + p[i][:-motion[1]])
+            q_move.append(p[i][-motion[1]:] + p[i][:-motion[1]])
+        for i in range(len(p)):
+            for j in range(len(p[i])):
+                q_move[i][j] *= p_move
+                q_stay[i][j] *= p_stay
+                q[i][j] = q_move[i][j] + q_stay[i][j]
+        
+            
     else:
         # Transpose the matrix, then do the same operation
         p_trans = [[row[i] for row in p] for i in range(len(p[0]))]
         for i in range(len(p_trans)):
-            q.append(p_trans[i][-motion[1]:] + p_trans[i][:-motion[1]])
+            q_move.append(p_trans[i][-motion[0]:] + p_trans[i][:-motion[0]])
         # When finish moving, transpose back to the original matrix p
-        q = [[p_move*row[i] for row in p_trans] for i in range(len(p_trans[0]))]
+        q_move_back = [[row[i] for row in q_move] for i in range(len(q_move[0]))]
+        q_move = q_move_back
+        
+        for i in range(len(p)):
+            for j in range(len(p[i])):
+                q_move[i][j] *= p_move
+                q_stay[i][j] *= p_stay
+                q[i][j] = q_move[i][j] + q_stay[i][j]        
         
     return q
     
@@ -107,3 +140,82 @@ measurements = ['G','G','G','G','G']
 motions = [[0,0],[0,1],[1,0],[1,0],[0,1]]
 p = localize(colors,measurements,motions,sensor_right = 0.7, p_move = 0.8)
 show(p) # displays your answer
+
+
+# TEST1
+#colors = [['G', 'G', 'G'],
+#          ['G', 'R', 'G'],
+#          ['G', 'G', 'G']]
+#measurements = ['R']
+#motions = [[0,0]]
+#sensor_right = 1.0
+#p_move = 1.0
+#
+#p = localize(colors,measurements,motions,sensor_right, p_move)
+#show(p)
+
+# TEST2
+#colors = [['G', 'G', 'G'],
+#          ['G', 'R', 'R'],
+#          ['G', 'G', 'G']]
+#measurements = ['R']
+#motions = [[0,0]]
+#sensor_right = 1.0
+#p_move = 1.0
+#p = localize(colors,measurements,motions,sensor_right, p_move)
+#show(p)
+
+# TEST3
+#colors = [['G', 'G', 'G'],
+#          ['G', 'R', 'R'],
+#          ['G', 'G', 'G']]
+#measurements = ['R']
+#motions = [[0,0]]
+#sensor_right = 0.8
+#p_move = 1.0
+#p = localize(colors,measurements,motions,sensor_right, p_move)
+#show(p)
+    
+# TEST4
+#colors = [['G', 'G', 'G'],
+#          ['G', 'R', 'R'],
+#          ['G', 'G', 'G']]
+#measurements = ['R', 'R']
+#motions = [[0,0], [0,1]]
+#sensor_right = 0.8
+#p_move = 1.0
+#p = localize(colors,measurements,motions,sensor_right, p_move)
+#show(p)
+
+# TEST5  move ONE step right [0,1]
+#colors = [['G', 'G', 'G'],
+#          ['G', 'R', 'R'],
+#          ['G', 'G', 'G']]
+#measurements = ['R', 'R']
+#motions = [[0,0], [0,1]]
+#sensor_right = 1.0
+#p_move = 1.0
+#p = localize(colors,measurements,motions,sensor_right, p_move)
+#show(p)
+
+# TEST6 
+#colors = [['G', 'G', 'G'],
+#          ['G', 'R', 'R'],
+#          ['G', 'G', 'G']]
+#measurements = ['R', 'R']
+#motions = [[0,0], [0,1]]
+#sensor_right = 0.8
+#p_move = 0.5
+#p = localize(colors,measurements,motions,sensor_right, p_move)
+#show(p)
+
+# TEST7
+#colors = [['G', 'G', 'G'],
+#          ['G', 'R', 'R'],
+#          ['G', 'G', 'G']]
+#measurements = ['R', 'R']
+#motions = [[0,0], [0,1]]
+#sensor_right = 1.0
+#p_move = 0.5
+#p = localize(colors,measurements,motions,sensor_right, p_move)
+#show(p)
